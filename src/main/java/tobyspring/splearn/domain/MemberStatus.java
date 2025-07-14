@@ -1,5 +1,5 @@
 package tobyspring.splearn.domain;
 
 public enum MemberStatus {
-    PENDING, ACTIVATE, DEACTIVATE
+    PENDING, ACTIVE, DEACTIVATED
 }

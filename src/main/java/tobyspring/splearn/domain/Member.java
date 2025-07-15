@@ -24,15 +24,7 @@ public class Member {
     public static Member create(MemberCreateRequest createRequest, PasswordEncoder passwordEncoder) {
         Member member = new Member();
 
-        String email = createRequest.email();
-
-//        Pattern EMAIL_PATTERN =
-//                Pattern.compile("^[a-zA-Z0-9_+&*-]+(?:\\.[a-zA-Z0-9_+&*-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,7}$");
-//        if (!EMAIL_PATTERN.matcher(email).matches()) {
-//            throw new IllegalArgumentException("이메일 형식이 바르지 않습니다: " + email);
-//        }
-
-        member.email = Objects.requireNonNull(createRequest.email());
+        member.email = new Email(Objects.requireNonNull(createRequest.email()));
         member.nickname = Objects.requireNonNull(createRequest.nickname());
         member.passwordHash = Objects.requireNonNull(passwordEncoder.encode(createRequest.password()));
 

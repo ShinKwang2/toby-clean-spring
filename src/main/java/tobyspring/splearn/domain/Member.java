@@ -1,32 +1,38 @@
 package tobyspring.splearn.domain;
 
-import lombok.Builder;
+import jakarta.persistence.*;
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.ToString;
 import org.springframework.util.Assert;
 
 import java.util.Objects;
-import java.util.regex.Pattern;
 
 @Getter
 @ToString
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Entity
 public class Member {
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Embedded
     private Email email;
 
     private String nickname;
 
     private String passwordHash;
 
+    @Enumerated(EnumType.STRING)
     private MemberStatus status;
 
-    private Member() {}
-
-    public static Member create(MemberCreateRequest createRequest, PasswordEncoder passwordEncoder) {
+    public static Member register(MemberRegisterRequest registerRequest, PasswordEncoder passwordEncoder) {
         Member member = new Member();
 
-        member.email = new Email(Objects.requireNonNull(createRequest.email()));
-        member.nickname = Objects.requireNonNull(createRequest.nickname());
-        member.passwordHash = Objects.requireNonNull(passwordEncoder.encode(createRequest.password()));
+        member.email = new Email(Objects.requireNonNull(registerRequest.email()));
+        member.nickname = Objects.requireNonNull(registerRequest.nickname());
+        member.passwordHash = Objects.requireNonNull(passwordEncoder.encode(registerRequest.password()));
 
         member.status = MemberStatus.PENDING;
 

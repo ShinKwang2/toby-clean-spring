@@ -21,13 +21,12 @@ public class MemberService implements MemberRegister {
     public Member register(MemberRegisterRequest registerRequest) {
         // check
 
-        // domain model
         Member member = Member.register(registerRequest, passwordEncoder);
 
         memberRepository.save(member);
 
         emailSender.send(member.getEmail(), "등록을 완료해주세요", "아래 링크를 클릭해서 등록을 완료해주세요");
 
-        return null;
+        return member;
     }
 }

@@ -1,92 +1,37 @@
 package tobyspring.splearn.application.provided;
 
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentMatchers;
-import org.mockito.Mockito;
-import org.springframework.test.util.ReflectionTestUtils;
-import tobyspring.splearn.application.MemberService;
-import tobyspring.splearn.application.required.EmailSender;
-import tobyspring.splearn.application.required.MemberRepository;
-import tobyspring.splearn.domain.Email;
-import tobyspring.splearn.domain.Member;
-import tobyspring.splearn.domain.MemberFixture;
-import tobyspring.splearn.domain.MemberStatus;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Import;
+import tobyspring.SplearnTestConfiguration;
+import tobyspring.splearn.domain.*;
 
-import java.util.ArrayList;
-import java.util.List;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import static org.assertj.core.api.Assertions.*;
+@SpringBootTest
+@Import(SplearnTestConfiguration.class)
+public class MemberRegisterTest {
 
-class MemberRegisterTest {
+    @Autowired
+    private MemberRegister memberRegister;
 
     @Test
-    void registerTestStub() {
-        MemberService register = new MemberService(
-                new MemberRepositoryStub(), new EmailSenderStub(), MemberFixture.createPasswordEncoder()
-        );
-
-        Member member = register.register(MemberFixture.createMemberRegisterRequest());
+    void register() {
+        Member member = memberRegister.register(MemberFixture.createMemberRegisterRequest());
 
         assertThat(member.getId()).isNotNull();
         assertThat(member.getStatus()).isEqualTo(MemberStatus.PENDING);
     }
 
     @Test
-    void registerTestMock() {
-        EmailSenderMock emailSenderMock = new EmailSenderMock();
-        MemberService register = new MemberService(
-                new MemberRepositoryStub(), emailSenderMock, MemberFixture.createPasswordEncoder()
-        );
+    void duplicateEmailFail() {
+        Member member = memberRegister.register(MemberFixture.createMemberRegisterRequest());
 
-        Member member = register.register(MemberFixture.createMemberRegisterRequest());
-
-        assertThat(member.getId()).isNotNull();
-        assertThat(member.getStatus()).isEqualTo(MemberStatus.PENDING);
-
-        assertThat(emailSenderMock.getTos()).hasSize(1);
-        assertThat(emailSenderMock.tos.getFirst()).isEqualTo(member.getEmail());
+        assertThatThrownBy(() -> {
+            memberRegister.register(MemberFixture.createMemberRegisterRequest());
+        }).isInstanceOf(DuplicateEmailException.class);
     }
-
-    @Test
-    void registerTestMockito() {
-        EmailSender emailSenderMock = Mockito.mock(EmailSender.class);
-        MemberService register = new MemberService(
-                new MemberRepositoryStub(), emailSenderMock, MemberFixture.createPasswordEncoder()
-        );
-
-        Member member = register.register(MemberFixture.createMemberRegisterRequest());
-
-        assertThat(member.getId()).isNotNull();
-        assertThat(member.getStatus()).isEqualTo(MemberStatus.PENDING);
-
-        Mockito.verify(emailSenderMock).send(ArgumentMatchers.eq(member.getEmail()), ArgumentMatchers.any(), ArgumentMatchers.any());
-    }
-
-    static class MemberRepositoryStub implements MemberRepository {
-        @Override
-        public Member save(Member member) {
-            ReflectionTestUtils.setField(member, "id", 1L);
-            return member;
-        }
-    }
-
-    static class EmailSenderMock implements EmailSender {
-        List<Email> tos = new ArrayList<>();
-
-        public List<Email> getTos() {
-            return tos;
-        }
-
-        @Override
-        public void send(Email email, String subject, String body) {
-            tos.add(email);
-        }
-    }
-
-    static class EmailSenderStub implements EmailSender {
-        @Override
-        public void send(Email email, String subject, String body) {
-        }
-    }
-
 }
+

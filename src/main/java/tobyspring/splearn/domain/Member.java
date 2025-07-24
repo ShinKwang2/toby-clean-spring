@@ -1,12 +1,11 @@
 package tobyspring.splearn.domain;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Entity;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import org.hibernate.annotations.NaturalId;
-import org.hibernate.annotations.NaturalIdCache;
 import org.springframework.util.Assert;
 
 import java.util.Objects;
@@ -14,24 +13,16 @@ import java.util.Objects;
 @Getter
 @ToString(callSuper = true)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@NaturalIdCache
-@Table(name = "MEMBER", uniqueConstraints =
-        @UniqueConstraint(name = "UK_MEMBER_EMAIL_ADDRESS", columnNames = "email_address")
-)
 @Entity
 public class Member extends AbstractEntity {
 
-    @Embedded @NaturalId
+    @NaturalId
     private Email email;
 
-    @Column(length = 100, nullable = false)
     private String nickname;
 
-    @Column(length = 200, nullable = false)
     private String passwordHash;
 
-    @Enumerated(EnumType.STRING)
-    @Column(length = 50, nullable = false)
     private MemberStatus status;
 
     public static Member register(MemberRegisterRequest registerRequest, PasswordEncoder passwordEncoder) {

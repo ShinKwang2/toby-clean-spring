@@ -15,19 +15,24 @@ import java.util.Objects;
 @ToString(callSuper = true)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @NaturalIdCache
+@Table(name = "MEMBER", uniqueConstraints =
+        @UniqueConstraint(name = "UK_MEMBER_EMAIL_ADDRESS", columnNames = "email_address")
+)
 @Entity
 public class Member extends AbstractEntity {
 
-    @NaturalId
+    @Embedded @NaturalId
     private Email email;
 
+    @Column(length = 100, nullable = false)
     private String nickname;
 
+    @Column(length = 200, nullable = false)
     private String passwordHash;
 
+    @Enumerated(EnumType.STRING)
+    @Column(length = 50, nullable = false)
     private MemberStatus status;
-
-    private MemberDetail detail;
 
     public static Member register(MemberRegisterRequest registerRequest, PasswordEncoder passwordEncoder) {
         Member member = new Member();

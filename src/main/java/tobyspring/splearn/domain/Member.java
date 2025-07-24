@@ -12,22 +12,19 @@ import org.springframework.util.Assert;
 import java.util.Objects;
 
 @Getter
-@ToString
+@ToString(callSuper = true)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @NaturalIdCache
 @Entity
-public class Member {
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+public class Member extends AbstractEntity {
 
-    @Embedded @NaturalId
+    @NaturalId
     private Email email;
 
     private String nickname;
 
     private String passwordHash;
 
-    @Enumerated(EnumType.STRING)
     private MemberStatus status;
 
     public static Member register(MemberRegisterRequest registerRequest, PasswordEncoder passwordEncoder) {

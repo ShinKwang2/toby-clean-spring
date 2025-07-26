@@ -1,9 +1,6 @@
 package tobyspring.splearn.domain.member;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.OneToOne;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -30,7 +27,6 @@ public class Member extends AbstractEntity {
 
     private MemberStatus status;
 
-    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private MemberDetail detail;
 
     public static Member register(MemberRegisterRequest registerRequest, PasswordEncoder passwordEncoder) {
@@ -52,11 +48,11 @@ public class Member extends AbstractEntity {
         Assert.state(status == MemberStatus.PENDING, "PENDING 상태가 아닙니다");
 
         this.status = MemberStatus.ACTIVE;
-        this.detail.setActivatedAt();
+        this.detail.activate();
     }
 
     public void deactivate() {
-        Assert.state(status == MemberStatus.ACTIVE, "ACTIVE 상태가 압니다.");
+        Assert.state(status == MemberStatus.ACTIVE, "ACTIVE 상태가 아닙니다.");
 
         this.status = MemberStatus.DEACTIVATED;
         this.detail.deactivate();
@@ -68,6 +64,13 @@ public class Member extends AbstractEntity {
 
     public void changeNickname(String nickname) {
         this.nickname = Objects.requireNonNull(nickname);
+    }
+
+    public void updateInfo(MemberInfoUpdateRequest updateRequest) {
+        this.nickname = Objects.requireNonNull(updateRequest.nickname());
+
+        this.detail.updateInfo(updateRequest);
+
     }
 
     public void changePassword(String password, PasswordEncoder passwordEncoder) {

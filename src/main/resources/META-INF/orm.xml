@@ -31,9 +31,18 @@
                 <column name="status" nullable="false" length="50"/>
                 <enumerated>STRING</enumerated>
             </basic>
+            <one-to-one name="detail" fetch="LAZY">
+                <cascade>
+                    <cascade-all/>
+                </cascade>
+            </one-to-one>
             <embedded name="email">
             </embedded>
         </attributes>
+    </entity>
+
+    <entity class="tobyspring.splearn.domain.member.MemberDetail">
+
     </entity>
 
     <embeddable class="tobyspring.splearn.domain.shared.Email">
